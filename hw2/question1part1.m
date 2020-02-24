@@ -5,7 +5,7 @@ clear all, close all,
 n = 2; 
 
 % number of iid samples for the data distribution
-N = 10000; 
+N = 1000; 
 
 mu(:,1) = [-2;0]; mu(:,2) = [2;0];
 
@@ -45,12 +45,13 @@ BestThreshold = 1;
 rocMarkerTruePositive = 0;
 rocMarkerfalsePositive = 0;
 
+discriminantScore = log(evalGaussian(x,mu(:,2),Sigma(:,:,2)))-log(evalGaussian(x,mu(:,1),Sigma(:,:,1)));
+  
 for iterator = 1:1:10000
     
   gamma = iterator;
   
-  discriminantScore = log(evalGaussian(x,mu(:,2),Sigma(:,:,2)))-log(evalGaussian(x,mu(:,1),Sigma(:,:,1)));
-  decision = (discriminantScore >= log(gamma));
+  decision = (discriminantScore >= log(gamma) - log(p(1) / p(2)));
 
   % probability of true negative
   ind00 = find(decision==0 & label==0); 
@@ -86,6 +87,38 @@ disp(minPerror);
 disp(BestThreshold);
 disp(rocMarkerTruePositive);
 disp(rocMarkerfalsePositive);
+
+decision = (discriminantScore >= 0);
+
+ind00 = find(decision==0 & label==0); 
+ind10 = find(decision==1 & label==0); 
+ind01 = find(decision==0 & label==1); 
+ind11 = find(decision==1 & label==1); 
+
+figure(2), % class 0 circle, class 1 +, correct green, incorrect red
+plot(x(1,ind00),x(2,ind00),'og'); hold on,
+plot(x(1,ind10),x(2,ind10),'or'); hold on,
+plot(x(1,ind01),x(2,ind01),'+r'); hold on,
+plot(x(1,ind11),x(2,ind11),'+g'); hold on,
+axis equal,
+
+% Make a grid to devise a contour of boundary on Dataset
+hGrid = linspace(floor(min(x(1,:))),ceil(max(x(1,:))),1000);
+vGrid = linspace(floor(min(x(2,:))),ceil(max(x(2,:))),1000);
+
+[h,v] = meshgrid(hGrid,vGrid);
+
+discriminantScoreGridValues = log(evalGaussian(0.1*[h(:)';v(:)'],mu(:,2),Sigma(:,:,2)))-0.9*log(evalGaussian([h(:)';v(:)'],mu(:,1),Sigma(:,:,1)));
+
+minDSGV = min(discriminantScoreGridValues);
+maxDSGV = max(discriminantScoreGridValues);
+
+discriminantScoreGrid = reshape(discriminantScoreGridValues,1000,1000);
+figure(2), contour(hGrid,vGrid,discriminantScoreGrid,[minDSGV*[0.9,0.6,0.3],0,[0.3,0.6,0.9]*maxDSGV]); % plot equilevel contours of the discriminant function 
+% including the contour at level 0 which is the decision boundary
+legend('Correct decisions for data from Class 0','Wrong decisions for data from Class 0','Wrong decisions for data from Class 1','Correct decisions for data from Class 1','Equilevel contours of the discriminant function' ), 
+title('Data and their classifier decisions versus true labels'),
+xlabel('x_1'), ylabel('x_2'),
 
 
 figure(3), clf,
