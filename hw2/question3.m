@@ -1,22 +1,40 @@
 i = 0;
+resultLikelihood1000 = [0];
+resultLikelihood100 = [0];
+resultLikelihood10 = [0];
 while 1
   i=i+1;
-  % Generate 6 Gaussian Mixture models for 1000 samples
-  EMforGMM(1000,6);
-  % Generate 6 Gaussian Mixture models for 10 samples
-
-  EMforGMM(10,3);
-  % Generate 6 Gaussian Mixture models for 100 samples
-
-  EMforGMM(100,3);
+  % Generate order 4 Gaussian Mixture models for 1000 samples
+  for M = 1:6
+    resultLikelihood1000 = [resultLikelihood1000,EMforGMM(1000,M)];
+  end
+  
+  
+  EMforGMM(10,4);
+  % Generate order 4 Gaussian Mixture models for 100 samples
+  for M = 1:6
+    resultLikelihood10 = [resultLikelihood10,EMforGMM(10,M)];
+  end
+  
+  EMforGMM(100,4);
+    % Generate order 4 Gaussian Mixture models for 100 samples
+  for M = 1:6
+    resultLikelihood100 = [resultLikelihood100,EMforGMM(100,M)];
+  end
   
   if i > 100
       break;
   
   end
 end
+
+x=-10000:10000;
+plot(x,resultLikelihood100);
+plot(x,resultLikelihood1000);
+plot(x,resultLikelihood10);
+
   
-function EMforGMM(N,M)
+function [result] = EMforGMM(N,M)
 % Generates N samples from a specified GMM,
 % then uses EM algorithm to estimate the parameters
 % of a GMM that has the same nu,mber of components
@@ -26,12 +44,14 @@ close all,
 delta = 1e-1; % tolerance for EM stopping criterion
 regWeight = 1e-10; % regularization parameter for covariance estimates
 
-% Generate samples from a 3-component GMM
-[alpha_true,mu_true,Sigma_true] = getParams(M)
-[init_alpha_true,init_mu_true,init_Sigma_true] = getParams(M)
+% Generate samples from a 4-component GMM
+[alpha_true,mu_true,Sigma_true] = getParams(4);
 
 x = randGMM(N,alpha_true,mu_true,Sigma_true);
+Mbak = M;
 [d,M] = size(mu_true); % determine dimensionality of samples and number of GMM components
+
+M = Mbak;
 
 % Bootstrap the data with 70%:30% ratio
 bootstrap_ratio = 0.7;
@@ -49,14 +69,21 @@ for m = 1:M % use sample covariances of initial assignments as initial covarianc
     Sigma(:,:,m) = cov(x(:,find(assignedCentroidLabels==m))') + regWeight*eye(d,d);
 end
 t = 0; 
-displayProgress(t,x,alpha,mu,Sigma);
-pause(20);
+%displayProgress(t,x,alpha,mu,Sigma);
+%pause(0.1);
 
+[init_alpha_true,init_mu_true,init_Sigma_true] = getParams(M); 
 
 Converged = 0; % Not converged at the beginning
 while ~Converged
     for l = 1:M
         temp(l,:) = repmat(alpha(l),1,N).*evalGaussian(x,mu(:,l),Sigma(:,:,l));
+    end
+    
+    if t==1
+       init_alpha_true = alphaNew;
+       init_mu_true = muNew;
+       init_Sigma_true = SigmaNew; 
     end
     
     plgivenx = temp./sum(temp,1);
@@ -76,7 +103,7 @@ while ~Converged
     Converged = ((Dalpha+Dmu+DSigma)<delta); % Check if converged
     alpha = alphaNew; mu = muNew; Sigma = SigmaNew;
     t = t+1;
-    displayProgress(t,x,alpha,mu,Sigma);
+    %displayProgress(t,x,alpha,mu,Sigma);
     
     if t % 300 == 0
        alpha = init_alpha_true
@@ -88,16 +115,11 @@ while ~Converged
        break;
     end
 end
-
-sumLogLikeLihood = 0;
-
+sumM = 0;
 for m=1:M
-    sumLogLikeLihood = sumLogLikeLihood + alpha(m)*evalGaussian(dataValidation,mu(m),Sigma(m));
+    sumM = sumM + alpha(m)*evalGaussian(dataValidation,mu(m),Sigma(m));
 end
-
-disp(" sumLogLikeLihood = " );
-disp(sumLogLikeLihood);
-
+result = [sumM];
 end
 %keyboard,
 
