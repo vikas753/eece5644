@@ -1,26 +1,48 @@
 i = 0;
-resultLikelihood1000 = [0];
-resultLikelihood100 = [0];
-resultLikelihood10 = [0];
+resultLikelihood1000order1 = [0];
+resultLikelihood1000order2 = [0];
+resultLikelihood1000order3 = [0];
+resultLikelihood1000order4 = [0];
+resultLikelihood1000order5 = [0];
+resultLikelihood1000order6 = [0];
+
+resultLikelihood100order1 = [0];
+resultLikelihood100order2 = [0];
+resultLikelihood100order3 = [0];
+resultLikelihood100order4 = [0];
+resultLikelihood100order5 = [0];
+resultLikelihood100order6 = [0];
+
+resultLikelihood10order1 = [0];
+resultLikelihood10order2 = [0];
+resultLikelihood10order3 = [0];
+resultLikelihood10order4 = [0];
+resultLikelihood10order5 = [0];
+resultLikelihood10order6 = [0];
+
 while 1
   i=i+1;
   % Generate order 4 Gaussian Mixture models for 1000 samples
-  for M = 1:6
-    resultLikelihood1000 = [resultLikelihood1000,EMforGMM(1000,M)];
-  end
+  resultLikelihood1000order1 = [resultLikelihood1000order1,EMforGMM(1000,1)];
+  resultLikelihood1000order2 = [resultLikelihood1000order2,EMforGMM(1000,2)];
+  resultLikelihood1000order3 = [resultLikelihood1000order3,EMforGMM(1000,3)];
+  resultLikelihood1000order4 = [resultLikelihood1000order4,EMforGMM(1000,4)];
+  resultLikelihood1000order5 = [resultLikelihood1000order5,EMforGMM(1000,5)];
+  resultLikelihood1000order6 = [resultLikelihood1000order6,EMforGMM(1000,6)];
   
+  resultLikelihood100order1 = [resultLikelihood100order1,EMforGMM(100,1)];
+  resultLikelihood100order2 = [resultLikelihood100order2,EMforGMM(100,2)];
+  resultLikelihood100order3 = [resultLikelihood100order3,EMforGMM(100,3)];
+  resultLikelihood100order4 = [resultLikelihood100order4,EMforGMM(100,4)];
+  resultLikelihood100order5 = [resultLikelihood100order5,EMforGMM(100,5)];
+  resultLikelihood100order6 = [resultLikelihood100order6,EMforGMM(100,6)];
   
-  EMforGMM(10,4);
-  % Generate order 4 Gaussian Mixture models for 100 samples
-  for M = 1:6
-    resultLikelihood10 = [resultLikelihood10,EMforGMM(10,M)];
-  end
-  
-  EMforGMM(100,4);
-    % Generate order 4 Gaussian Mixture models for 100 samples
-  for M = 1:6
-    resultLikelihood100 = [resultLikelihood100,EMforGMM(100,M)];
-  end
+  resultLikelihood10order1 = [resultLikelihood100order1,EMforGMM(10,1)];
+  resultLikelihood10order2 = [resultLikelihood100order2,EMforGMM(10,2)];
+  resultLikelihood10order3 = [resultLikelihood100order3,EMforGMM(10,3)];
+  resultLikelihood10order4 = [resultLikelihood100order4,EMforGMM(10,4)];
+  resultLikelihood10order5 = [resultLikelihood100order5,EMforGMM(10,5)];
+  resultLikelihood10order6 = [resultLikelihood100order6,EMforGMM(10,6)];
   
   if i > 100
       break;
@@ -28,12 +50,44 @@ while 1
   end
 end
 
-x=-10000:10000;
-plot(x,resultLikelihood100);
-plot(x,resultLikelihood1000);
-plot(x,resultLikelihood10);
+figure(2),
+%plot(resultLikelihood10order1);
+%plot(resultLikelihood10order2);
+%plot(resultLikelihood10order3);
+plot(resultLikelihood10order4);
+hold on,
+drawnow;
+%plot(resultLikelihood10order5);
+figure(3),
+plot(resultLikelihood10order6);
+hold on,
+drawnow;
+figure(4),
+%plot(resultLikelihood100order1);
+%plot(resultLikelihood100order2);
+%plot(resultLikelihood100order3);
+plot(resultLikelihood100order4);
+hold on,
+drawnow;
+%plot(resultLikelihood100order5);
+figure(5),
+plot(resultLikelihood100order6);
+hold on,
+drawnow;
+figure(6),
+%plot(resultLikelihood1000order1);
+%plot(resultLikelihood1000order2);
+%plot(resultLikelihood1000order3);
+plot(resultLikelihood1000order4);
+hold on,
+drawnow;
+%plot(resultLikelihood1000order5);
+figure(7),
+plot(resultLikelihood1000order6);
+hold on,
+drawnow;
+pause(100);
 
-  
 function [result] = EMforGMM(N,M)
 % Generates N samples from a specified GMM,
 % then uses EM algorithm to estimate the parameters
