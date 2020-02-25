@@ -87,8 +87,10 @@ function [plot_x1,plot_x2] = trainClassifier(N,figNumber)
   % Choose points to draw boundary line
   plot_x1 = [min(x(:,2))-2,  max(x(:,2))+2];                      
   plot_x2(1,:) = (-1./theta(3)).*(theta(2).*plot_x1 + theta(1));  
-  plot_x2(2,:) = (-1./(theta2(4) + theta2(5).*plot_x1)).*(theta2(3).*plot_x1.*plot_x1 + theta2(2).*plot_x1 + theta2(1)); % fminsearch
 
+  eqn = theta2(6).*plot_x2(2,:).*plot_x2(2,:)+(theta2(5).*plot_x1+theta(4)).*plot_x2(2,:)+theta(3) + theta(2).*plot_x1 + theta(1).*plot_x1.*plot_x1 == 0  
+  solve(eqn,plot_x(2,:),'real' ,true);
+  
   % Plot decision boundary
   plot(plot_x1, plot_x2(2,:));  
   axis([plot_x1(1), plot_x1(2), min(x(:,3))-2, max(x(:,3))+2]);
@@ -125,7 +127,7 @@ function test_classifier(plot_x1,plot_x2,figNumber)
   % Decide based on which side of the line each point is on
   for i = 1:2
       if coeff(i,1) >= 0
-          decision(:,i) = (coeff(i,1).*x_test(:,1) + coeff(i,2)) < x_test(:,2);
+          decision(:,i) = (coeff(i,5).*x_test(:,2).*x_test(:,2) + coeff(i,4).*x_test(:,1).*x_test(:,2) + coeff(i,3).*x_test(:,1).*x_test(:,1)+(:coeff(i,1).*x_test(:,1) + coeff(i,2)) < 0;
       else
           decision(:,i) = (coeff(i,1).*x_test(:,1) + coeff(i,2)) > x_test(:,2);
       end
