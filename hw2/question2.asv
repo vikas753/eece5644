@@ -63,27 +63,21 @@ for experiment = 1:NumExperiments
 end
 
 disp(estParamError);
-tempArray = ones(1,NumExperiments);
+tempArray = ones(1,length(log10gammaList));
 
 for gammaIndex=1:length(log10gammaList)
     for i=1:NumExperiments
-        tempArray(i) = estParamError(i,gammaIndex);
-    end
-    paramEstErrorMinL2Norm(gammaIndex) = min(tempArray);
-    paramEstErrorQuartileL2Norm(gammaIndex) = prctile(tempArray,25);
-    paramEstErrorMedianL2Norm(gammaIndex) = prctile(tempArray,50)
-    paramEstErrorLastQL2Norm(gammaIndex) = prctile(tempArray,75)
-end
-
+        tempArray(gammaIndex) = estParamError(i,gammaIndex)
+        
 figure(2),
-plot(10.^log10gammaList,paramEstErrorMinL2Norm),hold on,
+plot(indGamma,paramEstErrorMinL2Norm),hold on,
 drawnow;
 figure(3),
-plot(10.^log10gammaList,paramEstErrorQuartileL2Norm),hold on,
+plot(indGamma,paramEstErrorQuartileL2Norm),hold on,
 drawnow;
 figure(4),
-plot(10.^log10gammaList,paramEstErrorMedianL2Norm),hold on,
+plot(indGamma,paramEstErrorMedianL2Norm),hold on,
 drawnow;
 figure(5),
-plot(10.^log10gammaList,paramEstErrorLastQL2Norm),hold on,
+plot(indGamma,paramEstErrorLastQL2Norm),hold on,
 drawnow;
